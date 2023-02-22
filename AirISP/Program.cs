@@ -130,7 +130,7 @@ namespace AirISP
                 }
 
                 now += 0x80;
-                Console.WriteLine($"downloading...({now:X}/{latestAddr:X})");
+                Console.WriteLine($"downloading... {(double)(now- baseAddress) / (latestAddr - baseAddress) *100:f2}%");
             }
 
 
