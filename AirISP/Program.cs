@@ -54,7 +54,7 @@ namespace AirISP
             // 设置 write_flash 命令的处理器
             writeFlashCommand.SetHandler((baseParm, writeFlashParm) =>
             {
-                //TODO
+                WriteFlash(baseParm, writeFlashParm);
             },
             new BinderBaseParameter(chip, port, baud, trace, connect_attempts),
             new BinderWriteFlashParameter(writeFlashAddress, writeFlashFilename, writeFlashEarseAll, writeFlashNoProgress));
@@ -162,8 +162,9 @@ namespace AirISP
             Console.WriteLine("start write data ...");
             
             int baseAddress;
-            if (writeFlashParm.Address?.StartsWith("0x") == true) //0x开头，说明是16进制
+            if (writeFlashParm.Address.StartsWith("0x") == true || writeFlashParm.Address.StartsWith("0X") == true) //0x开头，说明是16进制
             {
+                writeFlashParm.Address = writeFlashParm.Address.Remove(0, 2);
                 baseAddress = int.Parse(writeFlashParm.Address, System.Globalization.NumberStyles.HexNumber);
             }
             else //10进制
@@ -215,10 +216,13 @@ namespace AirISP
 
                 if (writeFlashParm.NoProgress == false) //如果没有禁用进度条打印
                 {
-                    Console.WriteLine($"downloading... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
                     // 清除终端的这一行的打印
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    int currentLineCursor = Console.CursorTop;
+                    Console.SetCursorPosition(0, Console.CursorTop);
                     Console.Write(new string(' ', Console.WindowWidth));
+                    Console.SetCursorPosition(0, currentLineCursor);
+                    Console.WriteLine($"downloading... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
                 }
             }
 
