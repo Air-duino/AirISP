@@ -10,20 +10,20 @@ namespace AirISP
 {
     public class BaseParameter //命令前的参数
     {
-        public string? Chip { get; set; } //芯片型号
-        public string? Port { get; set; } //选择的串口端口
-        public int? Baud { get; set; } //波特率
-        public bool? Trace { get; set; } //是否打开AirISP的所有操作细节
-        public int? ConnectAttempts { get; set; } //尝试连接次数，默认 10
+        public string Chip { get; set; } = "auto"; //芯片型号
+        public string Port { get; set; } = "COM0"; //选择的串口端口
+        public int Baud { get; set; } = 115200; //波特率
+        public bool Trace { get; set; } = false; //是否打开AirISP的所有操作细节
+        public int ConnectAttempts { get; set; } = 10; //尝试连接次数，默认 10
     }
 
     public class WriteFlashParameter //write_flash的参数
     {
-        public string? Address { get; set; } //需要下载的地址
-        public string? Filename { get; set; }//需要下载的文件名
+        public string Address { get; set; } = "0";//需要下载的地址
+        public string Filename { get; set; } = "b.bin";//需要下载的文件名
 
-        public bool? EraseAll { get; set; } //在写固件时，擦除所有 flash 上所有扇区
-        public bool? NoProgress { get; set; } //禁用进度条打印
+        public bool EraseAll { get; set; } = false;//在写固件时，擦除所有 flash 上所有扇区
+        public bool NoProgress { get; set; } = false;//禁用进度条打印
     }
 
     public class BinderBaseParameter : BinderBase<BaseParameter>

@@ -11,21 +11,6 @@ namespace AirISP
 {
     internal class Program
     {
-        public struct BaseParameter //命令前的参数
-        {
-            public string chip;
-            public string port;
-            public string baud;
-            public bool trace;
-            public int connectAttempts;
-        }
-
-        public struct WriteFlashParameter //write_flash的参数
-        {
-            public string address;
-            public string filename;
-        }
-
         static int Main(string[] args)
         {
             // 创建根命令
@@ -84,17 +69,23 @@ namespace AirISP
             return 0;
         }
 
-        public static bool WriteFlash(string chip, string serialPort, int baud, bool trace, int connect_attempts, string address, string filename, bool earseAll, bool noProgress)
+        /// <summary>
+        /// 烧录固件的函数
+        /// </summary>
+        /// <param name="baseParm">命令前的所有参数</param>
+        /// <param name="writeFlashParm">write_flash的所有参数</param>
+        /// <returns></returns>
+        public static bool WriteFlash(BaseParameter baseParm, WriteFlashParameter writeFlashParm) 
         {
             Console.WriteLine($"AirISP v{Assembly.GetExecutingAssembly().GetName().Version}");
-            Console.WriteLine($"Serial port {serialPort}");
+            Console.WriteLine($"Serial port {baseParm.Port}");
             Console.WriteLine("Connect...");
 
             //读取固件数据
-            var data = File.ReadAllBytes(address[0]);
+            var data = File.ReadAllBytes(writeFlashParm.Filename!);
 
             //打开串口
-            var port = new SerialPort(serialPort, baud, Parity.Even, 8, StopBits.One);
+            var port = new SerialPort(baseParm.Port!, (int)baseParm.Baud!, Parity.Even, 8, StopBits.One);
             port.Open();
 
             if (port.IsOpen == false)
@@ -105,7 +96,7 @@ namespace AirISP
 
             //重启设备
             var resetResult = false;
-            for (int i = 0; i < connect_attempts; i++)
+            for (int i = 0; i < baseParm.ConnectAttempts; i++)
             {
                 Console.WriteLine($"try to reset device via rts and dtr ({i + 1}/10) ...");
                 if (TryReset(port, true))
@@ -169,14 +160,24 @@ namespace AirISP
 
             //刷代码进去
             Console.WriteLine("start write data ...");
-            var now = baseAddress;//现在的地址
+            
+            int baseAddress;
+            if (writeFlashParm.Address?.StartsWith("0x") == true) //0x开头，说明是16进制
+            {
+                baseAddress = int.Parse(writeFlashParm.Address, System.Globalization.NumberStyles.HexNumber);
+            }
+            else //10进制
+            {
+                baseAddress = int.Parse(writeFlashParm.Address!);
+            }
+            var now = baseAddress;
             var latestAddr = now + data.Length;//固件长度
             while (now < latestAddr)
             {
                 if (!retry(port, new byte[] { 0x31, 0xCE }, 0x79, 1, 50))
                 {
                     Console.WriteLine($"prepare writing to address 0x{now:X} failed.");
-                    return 4;
+                    return false;
                 }
                 var addrBytes = new byte[] {
                     (byte)(now/256/256/256),
@@ -192,7 +193,7 @@ namespace AirISP
                 if (!retry(port, addrBytes, 0x79, 1, 50))
                 {
                     Console.WriteLine($"set write address 0x{now:X} failed.");
-                    return 4;
+                    return false;
                 }
 
                 var flashData = new byte[1 + 128 + 1];
@@ -207,11 +208,18 @@ namespace AirISP
                 if (!retry(port, flashData, 0x79, 1, 500))
                 {
                     Console.WriteLine($"writing to address 0x{now:X} failed.");
-                    return 4;
+                    return false;
                 }
 
                 now += 0x80;
-                Console.WriteLine($"downloading... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
+
+                if (writeFlashParm.NoProgress == false) //如果没有禁用进度条打印
+                {
+                    Console.WriteLine($"downloading... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
+                    // 清除终端的这一行的打印
+                    Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    Console.Write(new string(' ', Console.WindowWidth));
+                }
             }
 
 
@@ -224,6 +232,8 @@ namespace AirISP
             Thread.Sleep(200);
             port.RtsEnable = false;
             Thread.Sleep(200);
+
+            return true;
         }
 
         /// <summary>
