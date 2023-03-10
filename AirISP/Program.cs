@@ -86,14 +86,15 @@ namespace AirISP
 
             //打开串口
             var port = new SerialPort(baseParm.Port!, (int)baseParm.Baud!, Parity.Even, 8, StopBits.One);
-            port.Open();
-
-            if (port.IsOpen == false)
+            try
             {
-                Console.WriteLine("Serial port opening failed!!!");
+                port.Open();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to open serial port: {ex.Message}");
                 return false;
             }
-
             //重启设备
             var resetResult = false;
             for (int i = 0; i < baseParm.ConnectAttempts; i++)
