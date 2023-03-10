@@ -98,13 +98,14 @@ namespace AirISP
             var resetResult = false;
             for (int i = 0; i < baseParm.ConnectAttempts; i++)
             {
-                Console.WriteLine($"try to reset device via rts and dtr ({i + 1}/10) ...");
+                //Console.WriteLine($"");
                 if (TryReset(port, true))
                 {
                     resetResult = true;
                     break;
                 }
             }
+            Console.WriteLine($"Connect success.");
             //自动重启失败，等待手动重启进boot
             if (!resetResult)
             {
@@ -128,7 +129,7 @@ namespace AirISP
             }
 
             //擦除数据
-            Console.WriteLine($"try erase flash ...");
+            Console.WriteLine($"Erasing flash (this may take a while)...");
             //试试看能不能进入擦除模式
             if (!retry(port, new byte[] { 0x44, 0xbb }, 0x79, 5, 100))
             {
@@ -160,16 +161,17 @@ namespace AirISP
 
             //刷代码进去
             Console.WriteLine("start write data ...");
-            
+            var nowTime = DateTime.Now;
+
+
             int baseAddress;
             if (writeFlashParm.Address.StartsWith("0x") == true || writeFlashParm.Address.StartsWith("0X") == true) //0x开头，说明是16进制
             {
-                writeFlashParm.Address = writeFlashParm.Address.Remove(0, 2);
-                baseAddress = int.Parse(writeFlashParm.Address, System.Globalization.NumberStyles.HexNumber);
+                baseAddress = Convert.ToInt32(writeFlashParm.Address, 16);
             }
             else //10进制
             {
-                baseAddress = int.Parse(writeFlashParm.Address!);
+                baseAddress = Convert.ToInt32(writeFlashParm.Address, 10);
             }
             var now = baseAddress;
             var latestAddr = now + data.Length;//固件长度
@@ -222,13 +224,13 @@ namespace AirISP
                     Console.SetCursorPosition(0, Console.CursorTop);
                     Console.Write(new string(' ', Console.WindowWidth));
                     Console.SetCursorPosition(0, currentLineCursor);
-                    Console.WriteLine($"downloading... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
+                    Console.WriteLine($"Writing at {now}... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
                 }
             }
-
+            Console.WriteLine($"Write {data.Length} bytes at {writeFlashParm.Address} in {DateTime.Now.Subtract(nowTime).TotalMilliseconds} ms");
 
             //正常重启进入运行模式
-            Console.WriteLine($"all done, reboot.");
+            Console.WriteLine($"Leaving...");
             port.DtrEnable = true;
             retry(port, new byte[] { 0x21, 0xde }, 0x79, 5, 100);
             retry(port, new byte[] { 0x08, 0, 0, 0, 0x08 }, 0x79, 1, 0);
