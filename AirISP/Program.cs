@@ -239,7 +239,7 @@ namespace AirISP
             Thread.Sleep(200);
             port.RtsEnable = false;
             Thread.Sleep(200);
-
+            port.Close();
             return true;
         }
 
