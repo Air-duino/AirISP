@@ -15,6 +15,8 @@ namespace AirISP
         public int Baud { get; set; } = 115200; //波特率
         public bool Trace { get; set; } = false; //是否打开AirISP的所有操作细节
         public int ConnectAttempts { get; set; } = 10; //尝试连接次数，默认 10
+        public string Before { get; set; } = "default_reset"; //指定芯片是否需要在 AirISP 其它命令执行之前重置为引导加载程序模式
+        public string After { get; set; } = "hard_reset"; //指定芯片是否需要在 AirISP 操作完成后重置芯片
     }
 
     public class WriteFlashParameter //write_flash的参数
@@ -33,14 +35,18 @@ namespace AirISP
         private readonly Option<int> _baud;
         private readonly Option<bool> _trace;
         private readonly Option<int> _connectAttempts;
+        private readonly Option<string> _before;
+        private readonly Option<string> _after;
 
-        public BinderBaseParameter(Option<string> chip, Option<string> port, Option<int> baud, Option<bool> trace, Option<int> connectAttempts)
+        public BinderBaseParameter(Option<string> chip, Option<string> port, Option<int> baud, Option<bool> trace, Option<int> connectAttempts,Option<string> before, Option<string> after)
         {
             _chip = chip;
             _port = port;
             _baud = baud;
             _trace = trace;
             _connectAttempts = connectAttempts;
+            _before = before;
+            _after = after;
         }
 
         protected override BaseParameter GetBoundValue(BindingContext bindingContext) =>
@@ -50,7 +56,9 @@ namespace AirISP
                 Port = bindingContext.ParseResult.GetValueForOption(_port),
                 Baud = bindingContext.ParseResult.GetValueForOption(_baud),
                 Trace = bindingContext.ParseResult.GetValueForOption(_trace),
-                ConnectAttempts = bindingContext.ParseResult.GetValueForOption(_connectAttempts)
+                ConnectAttempts = bindingContext.ParseResult.GetValueForOption(_connectAttempts),
+                Before = bindingContext.ParseResult.GetValueForOption(_before),
+                After = bindingContext.ParseResult.GetValueForOption(_after)
             };
     }
 
