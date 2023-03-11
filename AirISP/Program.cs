@@ -67,6 +67,34 @@ namespace AirISP
             // 将 write_flash 命令添加到根命令中
             rootCommand.AddCommand(writeFlashCommand);
 
+            //创建解除读保护命令
+            var readUnprotectCommand = new Command("read_unprotect", "Disables the read protection");
+
+            readUnprotectCommand.SetHandler((baseParm) =>
+            {
+                BasicOperation.SetBaseParameter(baseParm);
+                BasicOperation.Begin();
+
+                ReadUnprotectClass.ReadUnprotectCommand();
+            },
+            new BinderBaseParameter(chip, port, baud, trace, connect_attempts, before, after));
+
+            rootCommand.AddCommand(readUnprotectCommand);
+
+            //创建启动读保护命令
+            var readProtectCommand = new Command("read_protect", "Enables the read protection");
+
+            readProtectCommand.SetHandler((baseParm) =>
+            {
+                BasicOperation.SetBaseParameter(baseParm);
+                BasicOperation.Begin();
+
+                ReadProtectClass.ReadProtectCommand();
+            },
+            new BinderBaseParameter(chip, port, baud, trace, connect_attempts, before, after));
+
+            rootCommand.AddCommand(readProtectCommand);
+
             // 解析并执行命令行参数
             rootCommand.InvokeAsync(args);
 
