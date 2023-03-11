@@ -104,18 +104,30 @@ namespace AirISP
         /// <returns></returns>
         public static bool ResetBootloader()
         {
-            switch (baseParameter.Before)
+            Console.WriteLine("Connect...");
+            for (int i = 0; i < baseParameter.ConnectAttempts; i++)
             {
-                //DTR连接BOOT0，RTS连接RST
-                case "default_reset":
-                    serial.RtsEnable = true;
-                    serial.DtrEnable = false;
-                    Thread.Sleep(200);
-                    serial.RtsEnable = false;
-                    return Write(new byte[] { 0x7F }, 100);
+                switch (baseParameter.Before)
+                {
+                    //DTR连接BOOT0，RTS连接RST
+                    case "default_reset":
+                        serial.RtsEnable = true;
+                        serial.DtrEnable = false;
+                        Thread.Sleep(200);
+                        serial.RtsEnable = false;
 
-                default: return false;
+                        if (Write(new byte[] { 0x7F }, 100) == true)
+                        {
+                            Console.WriteLine($"Connect success.");
+                            return true;
+                        }
+                        break;
+
+                    default: return false;
+                }
             }
+            Console.WriteLine($"fail to reset device to boot status, timeout, exit");
+            return false;
         }
 
         public static bool ResetAPP()

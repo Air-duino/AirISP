@@ -29,29 +29,9 @@ namespace AirISP
         public static bool WriteFlash()
         {
 
-            Console.WriteLine("Connect...");
-
             //读取固件数据
             var data = File.ReadAllBytes(writeFlashParameter.Filename!);
-
-            //重启设备
-            var resetResult = false;
-            for (int i = 0; i < BasicOperation.baseParameter.ConnectAttempts; i++)
-            {
-                if (BasicOperation.ResetBootloader())
-                {
-                    resetResult = true;
-                    Console.WriteLine($"Connect success.");
-                    break;
-                }
-            }
-
-            //进boot没成功
-            if (!resetResult)
-            {
-                Console.WriteLine($"fail to reset device to boot status, timeout, exit");
-                return false;
-            }
+            BasicOperation.ResetBootloader();
 
             //擦除数据
             if (writeFlashParameter.EraseAll == true)
