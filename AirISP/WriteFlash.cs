@@ -29,8 +29,26 @@ namespace AirISP
         public static bool WriteFlash()
         {
 
-            //读取固件数据
-            var data = File.ReadAllBytes(writeFlashParameter.Filename!);
+            //检查传入的文件类型
+            var fi = new FileInfo(writeFlashParameter.Filename);
+            var extn = fi.Extension;
+            byte[] data;
+            switch (extn)
+            {
+                case ".bin":
+                    data = File.ReadAllBytes(writeFlashParameter.Filename);
+                    break;
+                case ".hex":
+                    (var address,data) = Tool.HexToBin(writeFlashParameter.Filename);
+                    writeFlashParameter.Address = address;
+                    break;
+                default:
+                    Console.WriteLine($"Please enter the correct filename.");
+                    Environment.Exit(0);
+                    return false;
+            }
+
+            
             BasicOperation.ResetBootloader();
 
             //擦除数据
