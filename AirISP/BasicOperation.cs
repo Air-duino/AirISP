@@ -157,7 +157,16 @@ namespace AirISP
         /// <returns></returns>
         public static bool Write(byte[] data, int timeOut = 200, int ACKCount = 1)
         {
-            serial.Write(data, 0, data.Length);
+            try
+            {
+                serial.Write(data, 0, data.Length);
+            }
+            catch (System.IO.IOException ex)
+            {
+                Console.WriteLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
+                Console.WriteLine(ex.ToString());
+            }
+            
             int length;
             for (int j = 0; j < ACKCount; j++)
             {
@@ -178,7 +187,15 @@ namespace AirISP
                     Thread.Sleep(1);
                 }
             }
-            serial.Write(new byte[] { 0x00 }, 0, 1);
+            try
+            {
+                serial.Write(new byte[] { 0x00 }, 0, 1);
+            }
+            catch (System.IO.IOException ex)
+            {
+                Console.WriteLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
+                Console.WriteLine(ex.ToString());
+            }
             return false;
         }
     }
