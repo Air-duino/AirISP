@@ -144,8 +144,8 @@ jobs:
         artifacts: "AirISP-linux-arm.zip,AirISP-linux-arm.zip,AirISP-linux-arm64.zip,AirISP-linux-arm64.zip,AirISP-linux-x64.zip,AirISP-linux-x64.zip,AirISP-osx-arm64.zip,AirISP-osx-arm64.zip,AirISP-osx-x64.zip,AirISP-osx-x64.zip,AirISP-win-arm.zip,AirISP-win-arm.zip,AirISP-win-arm64.zip,AirISP-win-arm64.zip,AirISP-win-x64.zip,AirISP-win-x64.zip,AirISP-win-x86.zip"
 
     - name: Send repository_dispatch event to package json
-        run: |
-          curl -X POST https://api.github.com/repos/Air-duino/Arduino-pack-json-ci/dispatches \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.USER_TOKEN }} \
-          --data '{"event_type": "AirISP"}'
+      run: |
+        curl -X POST https://api.github.com/repos/Air-duino/Arduino-pack-json-ci/dispatches \
+        -H 'Accept: application/vnd.github.everest-preview+json' \
+        -u ${{ secrets.USER_TOKEN }} \
+        --data '{"event_type": "AirISP"}'
