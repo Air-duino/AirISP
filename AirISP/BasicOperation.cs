@@ -110,7 +110,7 @@ namespace AirISP
                 switch (baseParameter.Before)
                 {
                     //DTR连接BOOT0，RTS连接RST
-                    case "default_reset":
+                    case "direct_connect":
                         serial.RtsEnable = true;
                         serial.DtrEnable = false;
                         Thread.Sleep(200);
@@ -121,6 +121,26 @@ namespace AirISP
                             Console.WriteLine($"Connect success.");
                             return true;
                         }
+                        break;
+
+                        // 采用异或电路
+                    case "default_reset":
+                        serial.DtrEnable = false;
+                        serial.RtsEnable = true;
+                        Thread.Sleep(10);
+
+                        serial.DtrEnable = true;
+                        serial.RtsEnable = false;
+                        Thread.Sleep(10);
+
+                        serial.DtrEnable = false;
+
+                        if (Write(new byte[] { 0x7F }, 100) == true)
+                        {
+                            Console.WriteLine($"Connect success.");
+                            return true;
+                        }
+
                         break;
 
                     default: return false;
@@ -137,10 +157,25 @@ namespace AirISP
             {
                 // 硬重启
                 case "hard_reset":
-                    serial.DtrEnable = true;
-                    serial.RtsEnable = true;
-                    Thread.Sleep(200);
-                    serial.RtsEnable = false;
+
+                    switch(baseParameter.Before)
+                    {
+                        case "direct_connect":
+                            serial.DtrEnable = true;
+                            serial.RtsEnable = true;
+                            Thread.Sleep(200);
+                            serial.RtsEnable = false;
+                            
+                            break;
+
+                        case "default_reset":
+                            serial.RtsEnable= true;
+
+                            Thread.Sleep(10);
+                            serial.RtsEnable = false;
+                            break;
+                    }
+
                     Console.WriteLine("Hard resetting via RTS pin...");
                     return true;
 

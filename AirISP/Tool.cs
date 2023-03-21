@@ -56,7 +56,7 @@ namespace AirISP
                         }
                         break;
                     case 1: // 文件结束记录，直接返回结果
-                        return (startAddress, binStream.ToArray());
+                        return (startAddress!, binStream.ToArray());
                     case 4: // 扩展线性地址记录，获取高16位地址并拼接为起始地址字符串，并重置当前地址位置为0x0000
                         string highAddress = hexLine.Substring(8, 4);
                         startAddress = "0x" + highAddress + "0000";
