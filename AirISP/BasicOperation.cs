@@ -125,13 +125,18 @@ namespace AirISP
 
                         // 采用异或电路
                     case "default_reset":
-                        serial.DtrEnable = false;
-                        serial.RtsEnable = true;
-                        Thread.Sleep(10);
-
                         serial.DtrEnable = true;
                         serial.RtsEnable = false;
+                        Thread.Sleep(20);
+
+                        serial.RtsEnable = true;
+                        serial.DtrEnable = false;
                         Thread.Sleep(10);
+
+                        serial.RtsEnable = false;
+                        serial.DtrEnable = true;
+
+                        Thread.Sleep(5);
 
                         serial.DtrEnable = false;
 
@@ -147,6 +152,7 @@ namespace AirISP
                 }
             }
             Console.WriteLine($"fail to reset device to boot status, timeout, exit");
+            Environment.Exit(0);
             return false;
         }
 
