@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "AirISP": {
-      "commandName": "Project",
-      "commandLineArgs": "D:\\projects\\git\\Air-duino\\Air001-ISP\\Project.bin COM9"
-    }
-  }
-}

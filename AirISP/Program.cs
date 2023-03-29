@@ -36,6 +36,42 @@ namespace AirISP
             rootCommand.Add(before);
             rootCommand.Add(after);
 
+            // 创建 chip_id 命令
+            var chipIDCommand = new Command("chip_id", "Get chip id");
+            chipIDCommand.SetHandler((baseParm) =>
+            {
+                BasicOperation.SetBaseParameter(baseParm);
+                BasicOperation.Begin();
+
+                GetClass.GetID();
+            },
+            new BinderBaseParameter(chip, port, baud, trace, connect_attempts, before, after));
+            rootCommand.AddCommand(chipIDCommand);
+
+            // 创建 get 命令
+            var getCommand = new Command("get", "Get the current ISP program version and the allowed commands");
+            getCommand.SetHandler((baseParm) =>
+            {
+                BasicOperation.SetBaseParameter(baseParm);
+                BasicOperation.Begin();
+
+                GetClass.Get();
+            },
+            new BinderBaseParameter(chip, port, baud, trace, connect_attempts, before, after));
+            rootCommand.AddCommand(getCommand);
+
+            // 创建 get_version 命令
+            var getVersionCommand = new Command("get_version", "Get the ISP program version and the read protection status of Flash");
+            getVersionCommand.SetHandler((baseParm) =>
+            {
+                BasicOperation.SetBaseParameter(baseParm);
+                BasicOperation.Begin();
+
+                GetClass.GetVersionAndReadProtectionStatus();
+            },
+            new BinderBaseParameter(chip, port, baud, trace, connect_attempts, before, after));
+            rootCommand.AddCommand(getVersionCommand);
+
             // 创建 write_flash 命令
             var writeFlashCommand = new Command("write_flash", "Write firmware to flash");
             // 添加命令参数

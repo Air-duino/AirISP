@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static AirISP.BasicOperation;
 
 namespace AirISP
 {
@@ -104,9 +105,47 @@ namespace AirISP
         /// <returns></returns>
         public static bool ResetBootloader()
         {
-            Console.WriteLine("Connect...");
+            Console.Write("Connect...");
+
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            CancellationToken token = tokenSource.Token;
+            ManualResetEvent resetEvent = new ManualResetEvent(true);
+            var LogTask = new Task(async () =>
+            {
+                int count = 0;
+                bool WriteFlag = true;
+                await Task.Delay(1000);
+                while (true)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                    resetEvent.WaitOne();
+                    if (count >= 3)
+                    {
+                        WriteFlag = !WriteFlag;
+                        count = 0;
+                        await Task.Delay(1000);
+                    }
+                    if (WriteFlag == false)
+                    {
+                        Console.Write(".");
+                    }
+                    else
+                    {
+                        Console.Write("_");
+                    }
+                    count++;
+                    await Task.Delay(200);
+                }
+            }, token);
+            LogTask.Start();
+
             for (int i = 0; i < baseParameter.ConnectAttempts; i++)
             {
+                serial.DiscardInBuffer();
+                serial.DiscardOutBuffer();
                 switch (baseParameter.Before)
                 {
                     //DTR连接BOOT0，RTS连接RST
@@ -115,15 +154,10 @@ namespace AirISP
                         serial.DtrEnable = false;
                         Thread.Sleep(200);
                         serial.RtsEnable = false;
-
-                        if (Write(new byte[] { 0x7F }, 100) == true)
-                        {
-                            Console.WriteLine($"Connect success.");
-                            return true;
-                        }
                         break;
 
-                        // 采用异或电路
+
+                    // 采用异或电路
                     case "default_reset":
                         serial.DtrEnable = true;
                         serial.RtsEnable = false;
@@ -140,18 +174,50 @@ namespace AirISP
 
                         serial.DtrEnable = false;
 
-                        if (Write(new byte[] { 0x7F }, 100) == true)
-                        {
-                            Console.WriteLine($"Connect success.");
-                            return true;
-                        }
-
                         break;
 
                     default: return false;
                 }
+
+                var data = new byte[] { 0x7F };
+
+                if (Write(data) == false)
+                {
+                    if (BasicOperation.baseParameter.Trace == true)
+                    {
+                        Console.WriteLine("connect fail, retry.");
+                    }
+                    continue;
+                }
+                resetEvent.Reset();
+                Console.WriteLine("");
+                for (int j = 0; j < 3; j++)
+                {
+                    if (GetClass.GetID() == false)
+                    {
+                        if (BasicOperation.baseParameter.Trace == true)
+                        {
+                            Console.WriteLine("Get chip ID fail, retry.");
+                        }
+
+                        //也许你看到这行代码的时候会感觉疑惑，这看起来是一个非常愚蠢的行为，让人无法理解。
+                        //但是事实并不是这样，经过逻辑分析仪的抓取，我们发现使用CDC驱动的USB转串口，在Windows下使能RTS或者DTR似乎会发出一个奇怪的字节，
+                        //这个字节可能是0x7F或者0xFD等，暂时还没找到什么规律。但是正因为串入了这个字节，因此mcu接收到的第一个字节就不是我们发送的用来握手的0x7F，
+                        //这样后续的整个指令将会完全乱掉，因此我们额外添加了一个字节去处理，假如GetID操作失败的话，很有可能就是因为发送的指令乱掉了，那么我们手动
+                        //加入一个字节来补全，并尝试重试3次。
+                        Write(new byte[] { 0x7F },5); //这个操作可能不会返回任何有效字节，只是单纯写入，因此超时时间可以设置小一点
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                return true;
             }
-            Console.WriteLine($"fail to reset device to boot status, timeout, exit");
+            resetEvent.Reset();
+            Console.WriteLine("");
+            Console.WriteLine($"fail to reset device to boot status, timeout, exit...");
             Environment.Exit(0);
             return false;
         }
@@ -164,18 +230,18 @@ namespace AirISP
                 // 硬重启
                 case "hard_reset":
 
-                    switch(baseParameter.Before)
+                    switch (baseParameter.Before)
                     {
                         case "direct_connect":
                             serial.DtrEnable = true;
                             serial.RtsEnable = true;
                             Thread.Sleep(200);
                             serial.RtsEnable = false;
-                            
+
                             break;
 
                         case "default_reset":
-                            serial.RtsEnable= true;
+                            serial.RtsEnable = true;
 
                             Thread.Sleep(10);
                             serial.RtsEnable = false;
@@ -207,7 +273,7 @@ namespace AirISP
                 Console.WriteLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
                 Console.WriteLine(ex.ToString());
             }
-            
+
             int length;
             for (int j = 0; j < ACKCount; j++)
             {
@@ -223,21 +289,53 @@ namespace AirISP
                             Console.WriteLine($"Retrieved data: {BitConverter.ToString(rev)}");
                         }
                         if (rev.Contains((byte)ReturnVal.ACK))
+                        {
                             return true;
+                        }
+
                     }
                     Thread.Sleep(1);
                 }
             }
+            return false;
+        }
+
+        /// <summary>
+        /// 向芯片中写入一系列数据，并返回读取到的全部数据
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="ACKCount"></param>
+        /// <returns></returns>
+        public static byte[]? WriteAndRead(byte[] data, int timeOut = 200, int ACKCount = 1)
+        {
             try
             {
-                serial.Write(new byte[] { 0x00 }, 0, 1);
+                serial.Write(data, 0, data.Length);
             }
             catch (System.IO.IOException ex)
             {
                 Console.WriteLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
                 Console.WriteLine(ex.ToString());
             }
-            return false;
+
+            int length;
+            for (int i = 0; i < timeOut; i++)
+            {
+                length = serial.BytesToRead;
+                if (length > 0)
+                {
+                    var rev = new byte[length];
+                    serial.Read(rev, 0, length);
+                    if (baseParameter.Trace == true)
+                    {
+                        Console.WriteLine($"Retrieved data: {BitConverter.ToString(rev)}");
+                    }
+                    return rev;
+                }
+                Thread.Sleep(1);
+            }
+            return null;
         }
     }
 }
