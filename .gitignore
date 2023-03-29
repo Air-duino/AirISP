@@ -351,3 +351,4 @@ MigrationBackup/
 
 #测试用的固件
 *.bin
+AirISP/Properties/launchSettings.json
