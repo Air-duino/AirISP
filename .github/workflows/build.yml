@@ -35,7 +35,7 @@ jobs:
           DOTNETARCH: ${{ matrix.dotnetarch }}
         run: |
           cd AirISP
-          dotnet publish -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=true --no-self-contained
+          dotnet publish -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
           mkdir pkg
           mv bin/Debug/net6.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
 
