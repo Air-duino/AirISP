@@ -160,5 +160,4 @@ jobs:
       env: 
         PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
       run: |
-        pio account login
         pio pkg publish AirISP-linux-arm.zip --type tool
