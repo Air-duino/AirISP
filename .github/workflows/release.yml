@@ -161,4 +161,4 @@ jobs:
         PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
       run: |
         pio account token
-        pio pkg publish AirISP-linux-arm.zip --type tool
+        pio pkg publish AirISP-linux-arm.zip --type tool --no-interactive
