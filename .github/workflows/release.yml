@@ -149,3 +149,13 @@ jobs:
         -H 'Accept: application/vnd.github.everest-preview+json' \
         -u ${{ secrets.USER_TOKEN }} \
         --data '{"event_type": "AirISP"}'
+
+    - name: publish PlatformIO
+      env: 
+        PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py -o get-platformio.py
+        python3 get-platformio.py
+
+        pio account login
+        pio pkg publish AirISP-linux-arm.zip --type tool
