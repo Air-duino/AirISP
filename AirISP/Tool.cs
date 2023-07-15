@@ -68,5 +68,17 @@ namespace AirISP
             }
             return (startAddress, binStream.ToArray());
         }
+
+        private static bool? isZh = null;
+        /// <summary>
+        /// 判断是非为中文系统
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsZh()
+        {
+            if(isZh == null)
+                isZh = System.Globalization.CultureInfo.CurrentCulture.Name.ToUpper().IndexOf("ZH") == 0;
+            return isZh.Value;
+        }
     }
 }

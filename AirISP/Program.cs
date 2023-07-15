@@ -14,20 +14,23 @@ namespace AirISP
         static int Main(string[] args)
         {
             // 创建根命令
-            var rootCommand = new RootCommand("AirISP is a tool for flash programming.");
+            var rootCommand = new RootCommand(
+                Tool.IsZh() ? 
+                "AirISP 是一个flash烧录工具" : 
+                "AirISP is a tool for flash programming.");
 
             // 添加通用参数
-            var chip = new Option<string>("--chip", "Target chip type, optional auto,air001");
+            var chip = new Option<string>("--chip", Tool.IsZh() ? "目标芯片型号，auto/air001" : "Target chip type, optional auto,air001");
             chip.AddAlias("-c");
-            var port = new Option<string>("--port", "Serial port device");
+            var port = new Option<string>("--port", Tool.IsZh() ? "串口名称" : "Serial port device");
             port.AddAlias("-p");
-            var baud = new Option<int>("--baud", "Serial port baud rate used when flashing/reading");
+            var baud = new Option<int>("--baud", Tool.IsZh() ? "串口波特率" : "Serial port baud rate used when flashing/reading");
             baud.AddAlias("-b");
-            var trace = new Option<bool>("--trace", () => false, "Enable trace-level output of AirISP interactions.");
+            var trace = new Option<bool>("--trace", () => false, Tool.IsZh() ? "启用trace日志输出" : "Enable trace-level output of AirISP interactions.");
             trace.AddAlias("-t");
-            var connect_attempts = new Option<int>("--connect-attempts", () => 10, "Number of attempts to connect, negative or 0 for infinite. Default: 10");
-            var before = new Option<string>("--before", () => "default_reset", "Specify the AirISP command to be preformed before execution.");
-            var after = new Option<string>("--after", () => "hard_reset", "Specify the AirISP command to be preformed after execution.");
+            var connect_attempts = new Option<int>("--connect-attempts", () => 10, Tool.IsZh() ? "最大重试次数，小于等于0表示无限次，默认为10次" : "Number of attempts to connect, negative or 0 for infinite. Default: 10");
+            var before = new Option<string>("--before", () => "default_reset", Tool.IsZh() ? "下载前要执行的操作" : "Specify the AirISP command to be preformed before execution.");
+            var after = new Option<string>("--after", () => "hard_reset", Tool.IsZh() ? "下载后要执行的操作" : "Specify the AirISP command to be preformed after execution.");
             rootCommand.Add(chip);
             rootCommand.Add(port);
             rootCommand.Add(baud);
@@ -37,7 +40,7 @@ namespace AirISP
             rootCommand.Add(after);
 
             // 创建 chip_id 命令
-            var chipIDCommand = new Command("chip_id", "Get chip id");
+            var chipIDCommand = new Command("chip_id", Tool.IsZh() ? "获取芯片ID" : "Get chip id");
             chipIDCommand.SetHandler((baseParm) =>
             {
                 BasicOperation.SetBaseParameter(baseParm);
@@ -49,7 +52,7 @@ namespace AirISP
             rootCommand.AddCommand(chipIDCommand);
 
             // 创建 get 命令
-            var getCommand = new Command("get", "Get the current ISP program version and the allowed commands");
+            var getCommand = new Command("get", Tool.IsZh() ? "获取ISP版本和支持的命令列表" : "Get the current ISP program version and the allowed commands");
             getCommand.SetHandler((baseParm) =>
             {
                 BasicOperation.SetBaseParameter(baseParm);
@@ -61,7 +64,7 @@ namespace AirISP
             rootCommand.AddCommand(getCommand);
 
             // 创建 get_version 命令
-            var getVersionCommand = new Command("get_version", "Get the ISP program version and the read protection status of Flash");
+            var getVersionCommand = new Command("get_version", Tool.IsZh() ? "获取ISP版本和芯片读保护状态" : "Get the ISP program version and the read protection status of Flash");
             getVersionCommand.SetHandler((baseParm) =>
             {
                 BasicOperation.SetBaseParameter(baseParm);
@@ -73,15 +76,15 @@ namespace AirISP
             rootCommand.AddCommand(getVersionCommand);
 
             // 创建 write_flash 命令
-            var writeFlashCommand = new Command("write_flash", "Write firmware to flash");
+            var writeFlashCommand = new Command("write_flash", Tool.IsZh() ? "向flash刷入固件" : "Write firmware to flash");
             // 添加命令参数
             var writeFlashAddress = new Argument<string>(name: "address", description: "0x00");
             var writeFlashFilename = new Argument<string>("filename");
 
             // 添加命令选项
-            var writeFlashEarseAll = new Option<bool>("--erase-all", "Erase all sectors on flash before writing (default only erase sectors to be written)");
+            var writeFlashEarseAll = new Option<bool>("--erase-all", Tool.IsZh() ? "全片擦除（默认只擦除待写入的页）" : "Erase all sectors on flash before writing (default only erase sectors to be written)");
             writeFlashEarseAll.AddAlias("-e");
-            var writeFlashNoProgress = new Option<bool>("--no-progress", "Disable progress bar printing");
+            var writeFlashNoProgress = new Option<bool>("--no-progress", Tool.IsZh() ? "禁止显示下载进度条" : "Disable progress bar printing");
             writeFlashNoProgress.AddAlias("-p");
 
             writeFlashCommand.Add(writeFlashAddress);
@@ -104,7 +107,7 @@ namespace AirISP
             rootCommand.AddCommand(writeFlashCommand);
 
             //创建解除读保护命令
-            var readUnprotectCommand = new Command("read_unprotect", "Disables the read protection");
+            var readUnprotectCommand = new Command("read_unprotect", Tool.IsZh() ? "关闭读保护" : "Disables the read protection");
 
             readUnprotectCommand.SetHandler((baseParm) =>
             {
@@ -118,7 +121,7 @@ namespace AirISP
             rootCommand.AddCommand(readUnprotectCommand);
 
             //创建启动读保护命令
-            var readProtectCommand = new Command("read_protect", "Enables the read protection");
+            var readProtectCommand = new Command("read_protect", Tool.IsZh() ? "开启读保护" : "Enables the read protection");
 
             readProtectCommand.SetHandler((baseParm) =>
             {

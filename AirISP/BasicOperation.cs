@@ -61,7 +61,7 @@ namespace AirISP
         public static bool Begin()
         {
             Console.WriteLine($"AirISP v{Assembly.GetExecutingAssembly().GetName().Version}");
-            Console.WriteLine($"Serial port {baseParameter.Port}");
+            Console.WriteLine($"{(Tool.IsZh() ? "串口" : "Serial port")} {baseParameter.Port}");
             if (serialStatus == false)
             {
                 serialStatus = true;
@@ -73,7 +73,7 @@ namespace AirISP
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to open serial port: {ex.Message}");
+                    Console.WriteLine($"{(Tool.IsZh() ? "打开串口失败" : "Failed to open serial port")}: {ex.Message}");
                     Environment.Exit(0);
                     return false;
                 }
@@ -105,7 +105,7 @@ namespace AirISP
         /// <returns></returns>
         public static bool ResetBootloader()
         {
-            Console.Write("Connect...");
+            Console.Write(Tool.IsZh() ? "连接中..." : "Connect...");
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken token = tokenSource.Token;
@@ -185,7 +185,7 @@ namespace AirISP
                 {
                     if (BasicOperation.baseParameter.Trace == true)
                     {
-                        Console.WriteLine("connect fail, retry.");
+                        Console.WriteLine(Tool.IsZh() ? "连接失败，重试" : "connect fail, retry.");
                     }
                     continue;
                 }
@@ -197,7 +197,7 @@ namespace AirISP
                     {
                         if (BasicOperation.baseParameter.Trace == true)
                         {
-                            Console.WriteLine("Get chip ID fail, retry.");
+                            Console.WriteLine(Tool.IsZh() ? "芯片ID获取失败，重试" : "Get chip ID fail, retry.");
                         }
 
                         //也许你看到这行代码的时候会感觉疑惑，这看起来是一个非常愚蠢的行为，让人无法理解。
@@ -217,7 +217,9 @@ namespace AirISP
             }
             resetEvent.Reset();
             Console.WriteLine("");
-            Console.WriteLine($"fail to reset device to boot status, timeout, exit...");
+            Console.WriteLine(Tool.IsZh() ? "自动进入boot模式失败，操作超时，结束操作...\r\n" +
+                "你可以尝试手动进入boot模式：按住BOOT按键不要松开，按一下RST复位，重新尝试下载操作\r\n" +
+                "（直到下载成功前，都不要松开BOOT按键，下载完成后再松开，然后按一下RST复位）" : "fail to reset device to boot status, timeout, exit...");
             Environment.Exit(0);
             return false;
         }
@@ -248,7 +250,7 @@ namespace AirISP
                             break;
                     }
 
-                    Console.WriteLine("Hard resetting via RTS pin...");
+                    Console.WriteLine(Tool.IsZh() ? "通过RTS硬件复位..." : "Hard resetting via RTS pin...");
                     return true;
 
                 default: return false;
