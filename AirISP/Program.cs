@@ -13,6 +13,9 @@ namespace AirISP
     {
         static int Main(string[] args)
         {
+            //防止控制台乱码
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
             // 创建根命令
             var rootCommand = new RootCommand(
                 Tool.IsZh() ? 
