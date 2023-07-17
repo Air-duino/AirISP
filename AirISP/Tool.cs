@@ -77,7 +77,12 @@ namespace AirISP
         public static bool IsZh()
         {
             if(isZh == null)
-                isZh = System.Globalization.CultureInfo.CurrentCulture.Name.ToUpper().IndexOf("ZH") == 0;
+            {
+                if (Environment.GetEnvironmentVariable("ENG_LANG") == "1")
+                    isZh = false;
+                else
+                    isZh = System.Globalization.CultureInfo.CurrentCulture.Name.ToUpper().IndexOf("ZH") == 0;
+            }
             return isZh.Value;
         }
     }

@@ -141,6 +141,11 @@ namespace AirISP
             rootCommand.InvokeAsync(args);
 
             BasicOperation.End();
+
+            if (Tool.IsZh())
+                Console.WriteLine("【提示】\r\n" +
+                    "若遇到因为AirMCU库活工具造成的BUG，请务必上报到下面的网址，以供开发者知晓该问题，并持续跟踪：\r\n" +
+                    "https://github.com/Air-duino/Arduino-AirMCU/issues");
             return 0;
         }
     }
