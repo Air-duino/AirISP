@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static AirISP.BasicOperation;
@@ -159,20 +160,46 @@ namespace AirISP
 
                     // 采用异或电路
                     case "default_reset":
-                        serial.DtrEnable = true;
-                        serial.RtsEnable = false;
-                        Thread.Sleep(20);
+                        //windows下面时序不准确，不容易进boot模式
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
+                            RuntimeInformation.OSArchitecture == Architecture.X64)
+                        {
+                            serial.Close();
+                            var p = new ProcessStartInfo("rst2boot.exe",serial.PortName) { RedirectStandardOutput = true };
+                            var rst2boot = Process.Start(p);
+                            using (var sr = rst2boot!.StandardOutput)
+                            {
+                                while (!sr.EndOfStream)
+                                {
+                                    Console.WriteLine(sr.ReadLine());
+                                }
+                                if (!rst2boot.HasExited)
+                                {
+                                    rst2boot.Kill();
+                                }
+                            }
+                            serial.RtsEnable = false;
+                            serial.DtrEnable = false;
+                            serial.Open();
+                        }
+                        else
+                        {
+                            //传统方法
+                            serial.DtrEnable = true;
+                            serial.RtsEnable = false;
+                            Thread.Sleep(20);
 
-                        serial.RtsEnable = true;
-                        serial.DtrEnable = false;
-                        Thread.Sleep(10);
+                            serial.RtsEnable = true;
+                            serial.DtrEnable = false;
+                            Thread.Sleep(10);
 
-                        serial.RtsEnable = false;
-                        serial.DtrEnable = true;
+                            serial.RtsEnable = false;
+                            serial.DtrEnable = true;
 
-                        Thread.Sleep(5);
+                            Thread.Sleep(5);
 
-                        serial.DtrEnable = false;
+                            serial.DtrEnable = false;
+                        }
 
                         break;
 
