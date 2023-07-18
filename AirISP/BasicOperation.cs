@@ -167,17 +167,7 @@ namespace AirISP
                             serial.Close();
                             var p = new ProcessStartInfo("rst2boot.exe",serial.PortName) { RedirectStandardOutput = true };
                             var rst2boot = Process.Start(p);
-                            using (var sr = rst2boot!.StandardOutput)
-                            {
-                                while (!sr.EndOfStream)
-                                {
-                                    Console.WriteLine(sr.ReadLine());
-                                }
-                                if (!rst2boot.HasExited)
-                                {
-                                    rst2boot.Kill();
-                                }
-                            }
+                            rst2boot!.WaitForExit();
                             serial.RtsEnable = false;
                             serial.DtrEnable = false;
                             serial.Open();

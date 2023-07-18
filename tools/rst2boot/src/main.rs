@@ -6,7 +6,6 @@ fn main() {
     //获取环境变量
     let args: Vec<String> = std::env::args().collect();
     let port = &args[1];
-    println!("port = {}", port);
     let mut port = serialport::new(port, 115200)
     .timeout(Duration::from_millis(10))
     .flow_control(FlowControl::None)
