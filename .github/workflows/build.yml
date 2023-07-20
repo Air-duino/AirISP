@@ -22,6 +22,8 @@ jobs:
             dotnetarch: x86
           - dotnetos: osx
             dotnetarch: arm
+          - dotnetos: osx
+            dotnetarch: arm64
       fail-fast: true
     steps:
       - uses: actions/checkout@v2

@@ -21,6 +21,8 @@ jobs:
             dotnetarch: x86
           - dotnetos: osx
             dotnetarch: arm
+          - dotnetos: osx
+            dotnetarch: arm64
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
@@ -55,36 +57,12 @@ jobs:
         path: AirISP-linux-arm/
     - uses: actions/download-artifact@v3
       with:
-        name: AirISP-linux-arm
-        path: AirISP-linux-arm/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-linux-arm64
-        path: AirISP-linux-arm64/
-    - uses: actions/download-artifact@v3
-      with:
         name: AirISP-linux-arm64
         path: AirISP-linux-arm64/
     - uses: actions/download-artifact@v3
       with:
         name: AirISP-linux-x64
         path: AirISP-linux-x64/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-linux-x64
-        path: AirISP-linux-x64/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-osx-arm64
-        path: AirISP-osx-arm64/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-osx-arm64
-        path: AirISP-osx-arm64/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-osx-x64
-        path: AirISP-osx-x64/
     - uses: actions/download-artifact@v3
       with:
         name: AirISP-osx-x64
@@ -95,20 +73,8 @@ jobs:
         path: AirISP-win-arm/
     - uses: actions/download-artifact@v3
       with:
-        name: AirISP-win-arm
-        path: AirISP-win-arm/
-    - uses: actions/download-artifact@v3
-      with:
         name: AirISP-win-arm64
         path: AirISP-win-arm64/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-win-arm64
-        path: AirISP-win-arm64/
-    - uses: actions/download-artifact@v3
-      with:
-        name: AirISP-win-x64
-        path: AirISP-win-x64/
     - uses: actions/download-artifact@v3
       with:
         name: AirISP-win-x64
@@ -121,20 +87,12 @@ jobs:
     - name: Create Release Asset
       run: |
         zip -r AirISP-linux-arm.zip AirISP-linux-arm/
-        zip -r AirISP-linux-arm.zip AirISP-linux-arm/
-        zip -r AirISP-linux-arm64.zip AirISP-linux-arm64/
         zip -r AirISP-linux-arm64.zip AirISP-linux-arm64/
         zip -r AirISP-linux-x64.zip AirISP-linux-x64/
-        zip -r AirISP-linux-x64.zip AirISP-linux-x64/
-        zip -r AirISP-osx-arm64.zip AirISP-osx-arm64/
-        zip -r AirISP-osx-arm64.zip AirISP-osx-arm64/
-        zip -r AirISP-osx-x64.zip AirISP-osx-x64/
+        zip -r AirISP-osx-arm64.zip AirISP-osx-x64/
         zip -r AirISP-osx-x64.zip AirISP-osx-x64/
         zip -r AirISP-win-arm.zip AirISP-win-arm/
-        zip -r AirISP-win-arm.zip AirISP-win-arm/
         zip -r AirISP-win-arm64.zip AirISP-win-arm64/
-        zip -r AirISP-win-arm64.zip AirISP-win-arm64/
-        zip -r AirISP-win-x64.zip AirISP-win-x64/
         zip -r AirISP-win-x64.zip AirISP-win-x64/
         zip -r AirISP-win-x86.zip AirISP-win-x86/
 
