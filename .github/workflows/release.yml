@@ -86,11 +86,23 @@ jobs:
 
     - name: Create Release Asset
       run: |
-        zip -r AirISP-linux-arm.zip AirISP-linux-arm/
-        zip -r AirISP-linux-arm64.zip AirISP-linux-arm64/
-        zip -r AirISP-linux-x64.zip AirISP-linux-x64/
-        zip -r AirISP-osx-arm64.zip AirISP-osx-x64/
-        zip -r AirISP-osx-x64.zip AirISP-osx-x64/
+        cd AirISP-linux-arm
+        chmod +x ./AirISP
+        cd ..
+        tar -cvf AirISP-linux-arm.tar AirISP-linux-arm/
+        cd AirISP-linux-arm64
+        chmod +x ./AirISP
+        cd ..
+        tar -cvf AirISP-linux-arm64.tar AirISP-linux-arm64/
+        cd AirISP-linux-x64
+        chmod +x ./AirISP
+        cd ..
+        tar -cvf AirISP-linux-x64.tar AirISP-linux-x64/
+        cd AirISP-osx-x64
+        chmod +x ./AirISP
+        cd ..
+        tar -cvf AirISP-osx-arm64.tar AirISP-osx-x64/
+        tar -cvf AirISP-osx-x64.tar AirISP-osx-x64/
         zip -r AirISP-win-arm.zip AirISP-win-arm/
         zip -r AirISP-win-arm64.zip AirISP-win-arm64/
         zip -r AirISP-win-x64.zip AirISP-win-x64/
@@ -99,7 +111,7 @@ jobs:
     - uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: "AirISP-linux-arm.zip,AirISP-linux-arm.zip,AirISP-linux-arm64.zip,AirISP-linux-arm64.zip,AirISP-linux-x64.zip,AirISP-linux-x64.zip,AirISP-osx-arm64.zip,AirISP-osx-arm64.zip,AirISP-osx-x64.zip,AirISP-osx-x64.zip,AirISP-win-arm.zip,AirISP-win-arm.zip,AirISP-win-arm64.zip,AirISP-win-arm64.zip,AirISP-win-x64.zip,AirISP-win-x64.zip,AirISP-win-x86.zip"
+        artifacts: "AirISP-linux-arm.tar,AirISP-linux-arm64.tar,AirISP-linux-x64.tar,AirISP-osx-arm64.tar,AirISP-osx-x64.tar,AirISP-win-arm.zip,AirISP-win-arm64.zip,AirISP-win-x64.zip,AirISP-win-x86.zip"
 
     - name: Send repository_dispatch event to package json
       run: |
