@@ -12,8 +12,8 @@ namespace AirISP
         {
             if (BasicOperation.baseParameter.Trace == true)
             {
-                Console.WriteLine("Start turn off read protection...");
-                Console.WriteLine("this will erase all content on your flash !!!");
+                ColorfulConsole.LogLine("Start turn off read protection...");
+                ColorfulConsole.WarnLine("this will erase all content on your flash !!!");
             }
             var data = new byte[] { (byte)BasicOperation.Command.ReadUnrotect, (byte)~BasicOperation.Command.ReadUnrotect };
             return BasicOperation.Write(data, 500, 2);//2次ACK
@@ -24,7 +24,7 @@ namespace AirISP
             BasicOperation.ResetBootloader();
             if (ReadUnprotectClass.ReadUnprotect() == false)
             {
-                Console.WriteLine($"Disable read protect failed.");
+                ColorfulConsole.WarnLine($"Disable read protect failed.");
                 return false;
             }
             BasicOperation.ResetAPP();

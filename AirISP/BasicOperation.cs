@@ -61,8 +61,8 @@ namespace AirISP
         /// <returns></returns>
         public static bool Begin()
         {
-            Console.WriteLine($"AirISP v{Assembly.GetExecutingAssembly().GetName().Version}");
-            Console.WriteLine($"{(Tool.IsZh() ? "串口" : "Serial port")} {baseParameter.Port}");
+            ColorfulConsole.SuccessLine($"AirISP v{Assembly.GetExecutingAssembly().GetName().Version}");
+            ColorfulConsole.InfoLine($"{(Tool.IsZh() ? "串口" : "Serial port")} {baseParameter.Port}");
             if (serialStatus == false)
             {
                 serialStatus = true;
@@ -74,7 +74,7 @@ namespace AirISP
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"{(Tool.IsZh() ? "打开串口失败" : "Failed to open serial port")}: {ex.Message}");
+                    ColorfulConsole.WarnLine($"{(Tool.IsZh() ? "打开串口失败" : "Failed to open serial port")}: {ex.Message}");
                     Environment.Exit(0);
                     return false;
                 }
@@ -106,7 +106,7 @@ namespace AirISP
         /// <returns></returns>
         public static bool ResetBootloader()
         {
-            Console.Write(Tool.IsZh() ? "连接中..." : "Connect...");
+            ColorfulConsole.Log(Tool.IsZh() ? "连接中..." : "Connect...");
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken token = tokenSource.Token;
@@ -131,11 +131,11 @@ namespace AirISP
                     }
                     if (WriteFlag == false)
                     {
-                        Console.Write(".");
+                        ColorfulConsole.Log(".");
                     }
                     else
                     {
-                        Console.Write("_");
+                        ColorfulConsole.Log("_");
                     }
                     count++;
                     await Task.Delay(200);
@@ -202,19 +202,19 @@ namespace AirISP
                 {
                     if (BasicOperation.baseParameter.Trace == true)
                     {
-                        Console.WriteLine(Tool.IsZh() ? "连接失败，重试" : "connect fail, retry.");
+                        ColorfulConsole.WarnLine(Tool.IsZh() ? "连接失败，重试" : "connect fail, retry.");
                     }
                     continue;
                 }
                 resetEvent.Reset();
-                Console.WriteLine("");
+                ColorfulConsole.LogLine("");
                 for (int j = 0; j < 3; j++)
                 {
                     if (GetClass.GetID() == false)
                     {
                         if (BasicOperation.baseParameter.Trace == true)
                         {
-                            Console.WriteLine(Tool.IsZh() ? "芯片ID获取失败，重试" : "Get chip ID fail, retry.");
+                            ColorfulConsole.WarnLine(Tool.IsZh() ? "芯片ID获取失败，重试" : "Get chip ID fail, retry.");
                         }
 
                         //也许你看到这行代码的时候会感觉疑惑，这看起来是一个非常愚蠢的行为，让人无法理解。
@@ -233,8 +233,8 @@ namespace AirISP
                 return true;
             }
             resetEvent.Reset();
-            Console.WriteLine("");
-            Console.WriteLine(Tool.IsZh() ? "自动进入boot模式失败，操作超时，结束操作...\r\n" +
+            ColorfulConsole.LogLine("");
+            ColorfulConsole.WarnLine(Tool.IsZh() ? "自动进入boot模式失败，操作超时，结束操作...\r\n" +
                 "你可以尝试手动进入boot模式：按住BOOT按键不要松开，按一下RST复位，重新尝试下载操作\r\n" +
                 "（直到下载成功前，都不要松开BOOT按键，下载完成后再松开，然后按一下RST复位）" : "fail to reset device to boot status, timeout, exit...");
             Environment.Exit(0);
@@ -243,7 +243,7 @@ namespace AirISP
 
         public static bool ResetAPP()
         {
-            Console.WriteLine($"Leaving...");
+            ColorfulConsole.LogLine($"Leaving...");
             switch (baseParameter.After)
             {
                 // 硬重启
@@ -267,7 +267,7 @@ namespace AirISP
                             break;
                     }
 
-                    Console.WriteLine(Tool.IsZh() ? "通过RTS硬件复位..." : "Hard resetting via RTS pin...");
+                    ColorfulConsole.LogLine(Tool.IsZh() ? "通过RTS硬件复位..." : "Hard resetting via RTS pin...");
                     return true;
 
                 default: return false;
@@ -289,8 +289,8 @@ namespace AirISP
             }
             catch (System.IO.IOException ex)
             {
-                Console.WriteLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
-                Console.WriteLine(ex.ToString());
+                ColorfulConsole.WarnLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
+                ColorfulConsole.LogLine(ex.ToString());
             }
 
             int length;
@@ -305,7 +305,7 @@ namespace AirISP
                         serial.Read(rev, 0, length);
                         if (baseParameter.Trace == true)
                         {
-                            Console.WriteLine($"Retrieved data: {BitConverter.ToString(rev)}");
+                            ColorfulConsole.LogLine($"Retrieved data: {BitConverter.ToString(rev)}");
                         }
                         if (rev.Contains((byte)ReturnVal.ACK))
                         {
@@ -334,8 +334,8 @@ namespace AirISP
             }
             catch (System.IO.IOException ex)
             {
-                Console.WriteLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
-                Console.WriteLine(ex.ToString());
+                ColorfulConsole.WarnLine($"There seems to be a problem with your serial device, please re-run the ISP software or replace the device and try again.");
+                ColorfulConsole.LogLine(ex.ToString());
             }
 
             int length;
@@ -348,7 +348,7 @@ namespace AirISP
                     serial.Read(rev, 0, length);
                     if (baseParameter.Trace == true)
                     {
-                        Console.WriteLine($"Retrieved data: {BitConverter.ToString(rev)}");
+                        ColorfulConsole.LogLine($"Retrieved data: {BitConverter.ToString(rev)}");
                     }
                     return rev;
                 }

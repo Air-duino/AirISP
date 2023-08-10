@@ -12,7 +12,7 @@ namespace AirISP
         {
             if (BasicOperation.baseParameter.Trace == true)
             {
-                Console.WriteLine("Start turn on read protection...");
+                ColorfulConsole.LogLine("Start turn on read protection...");
             }
             var data = new byte[] { (byte)BasicOperation.Command.ReadProtect, (byte)~BasicOperation.Command.ReadProtect };
             return BasicOperation.Write(data, 500, 2);//2次ACK
@@ -23,7 +23,7 @@ namespace AirISP
             BasicOperation.ResetBootloader();
             if (ReadProtectClass.ReadProtect() == false)
             {
-                Console.WriteLine($"Enable read protect failed.");
+                ColorfulConsole.WarnLine($"Enable read protect failed.");
                 return false;
             }
             BasicOperation.ResetAPP();

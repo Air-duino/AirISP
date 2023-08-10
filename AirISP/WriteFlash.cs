@@ -43,7 +43,7 @@ namespace AirISP
                     writeFlashParameter.Address = address;
                     break;
                 default:
-                    Console.WriteLine($"Please enter the correct filename.");
+                    ColorfulConsole.WarnLine($"Please enter the correct filename.");
                     Environment.Exit(0);
                     return false;
             }
@@ -67,7 +67,7 @@ namespace AirISP
                 data = d.ToArray();
             }
             //刷代码进去
-            Console.WriteLine("start write data ...");
+            ColorfulConsole.LogLine("start write data ...");
             var nowTime = DateTime.Now;
 
             int baseAddress;
@@ -86,7 +86,7 @@ namespace AirISP
                 var command = new byte[] { (byte)BasicOperation.Command.WriteMemory, (byte)~BasicOperation.Command.WriteMemory };
                 if (BasicOperation.Write(command, 500) == false)
                 {
-                    Console.WriteLine($"prepare writing to address 0x{now:X} failed.");
+                    ColorfulConsole.WarnLine($"prepare writing to address 0x{now:X} failed.");
                     return false;
                 }
                 var addrBytes = new byte[5] {
@@ -102,7 +102,7 @@ namespace AirISP
                 }
                 if (BasicOperation.Write(addrBytes) == false)
                 {
-                    Console.WriteLine($"set write address 0x{now:X} failed.");
+                    ColorfulConsole.WarnLine($"set write address 0x{now:X} failed.");
                     return false;
                 }
 
@@ -117,7 +117,7 @@ namespace AirISP
                 flashData[flashData.Length - 1] = xor;
                 if (BasicOperation.Write(flashData, 500) == false)
                 {
-                    Console.WriteLine($"writing to address 0x{now:X} failed.");
+                    ColorfulConsole.WarnLine($"writing to address 0x{now:X} failed.");
                     return false;
                 }
 
@@ -131,14 +131,14 @@ namespace AirISP
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
                         int currentLineCursor = Console.CursorTop;
                         Console.SetCursorPosition(0, Console.CursorTop);
-                        Console.Write(new string(' ', Console.WindowWidth));
+                        ColorfulConsole.Log(new string(' ', Console.WindowWidth));
                         Console.SetCursorPosition(0, currentLineCursor);
                     }
-                    Console.WriteLine($"Writing at {now}... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
+                    ColorfulConsole.InfoLine($"Writing at {now}... {(double)(now - baseAddress) / (latestAddr - baseAddress) * 100:f2}%");
                 }
             }
-            Console.WriteLine($"Write {data.Length} bytes at {writeFlashParameter.Address} in {DateTime.Now.Subtract(nowTime).TotalMilliseconds} ms");
-            Console.WriteLine("");
+            ColorfulConsole.SuccessLine($"Write {data.Length} bytes at {writeFlashParameter.Address} in {DateTime.Now.Subtract(nowTime).TotalMilliseconds} ms");
+            ColorfulConsole.LogLine("");
             //正常重启进入运行模式
             BasicOperation.ResetAPP();
 
