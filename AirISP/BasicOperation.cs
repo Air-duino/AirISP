@@ -162,7 +162,8 @@ namespace AirISP
                     case "default_reset":
                         //windows下面时序不准确，不容易进boot模式
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
-                            RuntimeInformation.OSArchitecture == Architecture.X64)
+                            RuntimeInformation.OSArchitecture == Architecture.X64 &&
+                            File.Exists("rst2boot.exe"))
                         {
                             serial.Close();
                             var p = new ProcessStartInfo("rst2boot.exe",serial.PortName) { RedirectStandardOutput = true };
@@ -235,8 +236,9 @@ namespace AirISP
             resetEvent.Reset();
             ColorfulConsole.LogLine("");
             ColorfulConsole.WarnLine(Tool.IsZh() ? "自动进入boot模式失败，操作超时，结束操作...\r\n" +
-                "你可以尝试手动进入boot模式：按住BOOT按键不要松开，按一下RST复位，重新尝试下载操作\r\n" +
-                "（直到下载成功前，都不要松开BOOT按键，下载完成后再松开，然后按一下RST复位）" : "fail to reset device to boot status, timeout, exit...");
+                "你可以尝试手动进入boot模式：\r\n" +
+                "拔掉USB、按住BOOT按键不要松开、插入USB，重新尝试下载操作。\r\n" +
+                "下载完成后，再松开松开BOOT按键，此时再按一下RST复位即可。" : "fail to reset device to boot status, timeout, exit...");
             Environment.Exit(0);
             return false;
         }
