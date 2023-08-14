@@ -277,6 +277,26 @@ namespace AirISP
         }
 
         /// <summary>
+        /// 读取连续完整的串口数据
+        /// </summary>
+        /// <returns></returns>
+        private static byte[] readSerial()
+        {
+            //一次性读完，防止读不全
+            var buff = new List<byte>();
+            var toRead = serial.BytesToRead;
+            while (toRead > 0)
+            {
+                var buffer = new byte[toRead];
+                serial.Read(buffer, 0, toRead);
+                buff.AddRange(buffer);
+                Thread.Sleep(1);
+                toRead = serial.BytesToRead;
+            }
+            return buff.ToArray();
+        }
+
+        /// <summary>
         /// 向芯片中写入一系列数据，并检查是否有ACK
         /// </summary>
         /// <param name="serial"></param>
@@ -303,8 +323,7 @@ namespace AirISP
                     length = serial.BytesToRead;
                     if (length > 0)
                     {
-                        var rev = new byte[length];
-                        serial.Read(rev, 0, length);
+                        var rev = readSerial();
                         if (baseParameter.Trace == true)
                         {
                             ColorfulConsole.LogLine($"Retrieved data: {BitConverter.ToString(rev)}");
@@ -346,8 +365,7 @@ namespace AirISP
                 length = serial.BytesToRead;
                 if (length > 0)
                 {
-                    var rev = new byte[length];
-                    serial.Read(rev, 0, length);
+                    var rev = readSerial();
                     if (baseParameter.Trace == true)
                     {
                         ColorfulConsole.LogLine($"Retrieved data: {BitConverter.ToString(rev)}");
