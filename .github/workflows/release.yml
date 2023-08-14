@@ -26,8 +26,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: environment prepare
         run: |
-          sudo apt-get update
-          sudo apt-get install -y dotnet-sdk-7.0
+          curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --channel STS
       - name: build
         env:
           DOTNETOS: ${{ matrix.dotnetos }}
