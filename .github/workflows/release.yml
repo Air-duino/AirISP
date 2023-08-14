@@ -21,15 +21,13 @@ jobs:
             dotnetarch: x86
           - dotnetos: osx
             dotnetarch: arm
-          - dotnetos: osx
-            dotnetarch: arm64
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
       - name: environment prepare
         run: |
           sudo apt-get update
-          sudo apt-get install -y dotnet-sdk-6.0
+          sudo apt-get install -y dotnet-sdk-7.0
       - name: build
         env:
           DOTNETOS: ${{ matrix.dotnetos }}
@@ -38,7 +36,7 @@ jobs:
           cd AirISP
           dotnet publish --configuration Release -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
           mkdir pkg
-          mv bin/Release/net6.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
+          mv bin/Release/net7.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
 
       - uses: actions/upload-artifact@v3
         with:
@@ -69,6 +67,10 @@ jobs:
         path: AirISP-osx-x64/
     - uses: actions/download-artifact@v3
       with:
+        name: AirISP-osx-arm64
+        path: AirISP-osx-arm64/
+    - uses: actions/download-artifact@v3
+      with:
         name: AirISP-win-arm
         path: AirISP-win-arm/
     - uses: actions/download-artifact@v3
@@ -87,21 +89,24 @@ jobs:
     - name: Create Release Asset
       run: |
         cd AirISP-linux-arm
-        chmod +x ./AirISP
+        chmod +x ./*
         cd ..
         tar -cvf AirISP-linux-arm.tar AirISP-linux-arm/
         cd AirISP-linux-arm64
-        chmod +x ./AirISP
+        chmod +x ./*
         cd ..
         tar -cvf AirISP-linux-arm64.tar AirISP-linux-arm64/
         cd AirISP-linux-x64
-        chmod +x ./AirISP
+        chmod +x ./*
         cd ..
         tar -cvf AirISP-linux-x64.tar AirISP-linux-x64/
-        cd AirISP-osx-x64
-        chmod +x ./AirISP
+        cd AirISP-osx-arm64
+        chmod +x ./*
         cd ..
-        tar -cvf AirISP-osx-arm64.tar AirISP-osx-x64/
+        tar -cvf AirISP-osx-arm64.tar AirISP-osx-arm64/
+        cd AirISP-osx-x64
+        chmod +x ./*
+        cd ..
         tar -cvf AirISP-osx-x64.tar AirISP-osx-x64/
         zip -r AirISP-win-arm.zip AirISP-win-arm/
         zip -r AirISP-win-arm64.zip AirISP-win-arm64/
