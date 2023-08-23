@@ -109,6 +109,41 @@ namespace AirISP
             // 将 write_flash 命令添加到根命令中
             rootCommand.AddCommand(writeFlashCommand);
 
+            ////////////////////////////////////////////////////////////////////
+            // 创建 read_flash 命令
+            var readFlashCommand = new Command("read_flash", Tool.IsZh() ? "读取flash中的固件" : "Read firmware from flash");
+            // 添加命令参数
+            var readFlashAddress = new Argument<string>(name: "address", description: "0x00");
+            var readFlashLength = new Argument<int>("length");
+            var readFlashFilename = new Argument<string>("filename");
+
+            // 添加命令选项
+            var readFlashNoProgress = new Option<bool>("--no-progress", Tool.IsZh() ? "禁止显示下载进度条" : "Disable progress bar printing");
+            readFlashNoProgress.AddAlias("-p");
+            var readFlashOverwrite = new Option<bool>("--overwrite", Tool.IsZh() ? "覆盖已存在的文件" : "Overwrite exist file");
+            readFlashOverwrite.AddAlias("-o");
+
+            readFlashCommand.Add(readFlashAddress);
+            readFlashCommand.Add(readFlashLength);
+            readFlashCommand.Add(readFlashFilename);
+            readFlashCommand.Add(readFlashNoProgress);
+            readFlashCommand.Add(readFlashOverwrite);
+
+            // 设置 read_flash 命令的处理器
+            readFlashCommand.SetHandler((baseParm, readFlashParm) =>
+            {
+                BasicOperation.SetBaseParameter(baseParm);
+                BasicOperation.Begin();
+
+                ReadFlash.SetReadFlashParameter(readFlashParm);
+                ReadFlash.Read();
+            },
+            new BinderBaseParameter(chip, port, baud, trace, connect_attempts, before, after),
+            new BinderReadFlashParameter(readFlashAddress, readFlashLength, readFlashFilename, readFlashNoProgress, readFlashOverwrite));
+            // 将 read_flash 命令添加到根命令中
+            rootCommand.AddCommand(readFlashCommand);
+            //////////////////////////////////////////////////////////////////////
+
             //创建解除读保护命令
             var readUnprotectCommand = new Command("read_unprotect", Tool.IsZh() ? "关闭读保护" : "Disables the read protection");
 

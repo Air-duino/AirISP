@@ -28,6 +28,18 @@ namespace AirISP
         public bool NoProgress { get; set; } = false;//禁用进度条打印
     }
 
+    /// <summary>
+    /// read_flash的参数
+    /// </summary>
+    public class ReadFlashParameter
+    {
+        public string Address { get; set; } = "0";//需要下载的地址
+        public int Length { get; set; } = 0;//读取的数据长度
+        public string Filename { get; set; } = "b.bin";//需要下载的文件名
+        public bool NoProgress { get; set; } = false;//禁用进度条打印
+        public bool Overwrite { get; set; } = false;//覆盖文件
+    }
+
     public class BinderBaseParameter : BinderBase<BaseParameter>
     {
         private readonly Option<string> _chip;
@@ -85,6 +97,35 @@ namespace AirISP
 
                 EraseAll = bindingContext.ParseResult.GetValueForOption(_eraseAll),
                 NoProgress = bindingContext.ParseResult.GetValueForOption(_noProgress)
+            };
+    }
+    
+
+    public class BinderReadFlashParameter : BinderBase<ReadFlashParameter>
+    {
+        private readonly Argument<string> _address;
+        private readonly Argument<int> _length;
+        private readonly Argument<string> _filename;
+        private readonly Option<bool> _noProgress;
+        private readonly Option<bool> _overwrite;
+
+        public BinderReadFlashParameter(Argument<string> address, Argument<int> length, Argument<string> filename, Option<bool> noProgress, Option<bool> overwrite)
+        {
+            _address = address;
+            _length = length;
+            _filename = filename;
+            _noProgress = noProgress;
+            _overwrite = overwrite;
+        }
+
+        protected override ReadFlashParameter GetBoundValue(BindingContext bindingContext) =>
+            new ReadFlashParameter
+            {
+                Address = bindingContext.ParseResult.GetValueForArgument(_address),
+                Length = bindingContext.ParseResult.GetValueForArgument(_length),
+                Filename = bindingContext.ParseResult.GetValueForArgument(_filename),
+                NoProgress = bindingContext.ParseResult.GetValueForOption(_noProgress),
+                Overwrite = bindingContext.ParseResult.GetValueForOption(_overwrite)
             };
     }
 }
