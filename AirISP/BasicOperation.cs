@@ -308,6 +308,10 @@ namespace AirISP
             try
             {
                 serial.Write(data, 0, data.Length);
+                if (baseParameter.Trace == true)
+                {
+                    ColorfulConsole.LogLine($"Sent data: {BitConverter.ToString(data, 0, data.Length)}");
+                }
             }
             catch (System.IO.IOException ex)
             {
@@ -352,6 +356,10 @@ namespace AirISP
             try
             {
                 serial.Write(data, 0, data.Length);
+                if (baseParameter.Trace == true)
+                {
+                    ColorfulConsole.LogLine($"Sent data: {BitConverter.ToString(data, 0, data.Length)}");
+                }
             }
             catch (System.IO.IOException ex)
             {
