@@ -44,7 +44,7 @@ namespace AirISP
                     break;
                 default:
                     ColorfulConsole.WarnLine($"Please enter the correct filename.");
-                    Environment.Exit(0);
+                    Environment.Exit(3);
                     return false;
             }
 
@@ -87,7 +87,7 @@ namespace AirISP
                 if (BasicOperation.Write(command, 500) == false)
                 {
                     ColorfulConsole.WarnLine($"prepare writing to address 0x{now:X} failed.");
-                    return false;
+                    Environment.Exit(4);
                 }
                 var addrBytes = new byte[5] {
                     (byte)(now/256/256/256),
@@ -103,7 +103,7 @@ namespace AirISP
                 if (BasicOperation.Write(addrBytes) == false)
                 {
                     ColorfulConsole.WarnLine($"set write address 0x{now:X} failed.");
-                    return false;
+                    Environment.Exit(4);
                 }
 
                 var flashData = new byte[1 + 128 + 1];
@@ -118,7 +118,7 @@ namespace AirISP
                 if (BasicOperation.Write(flashData, 500) == false)
                 {
                     ColorfulConsole.WarnLine($"writing to address 0x{now:X} failed.");
-                    return false;
+                    Environment.Exit(4);
                 }
 
                 now += 0x80;

@@ -1,0 +1,5 @@
+0 - normal
+1 - no ACK recieved. see https://wiki.luatos.com/chips/air001/mcu.html#id4
+2 - Failed to open serial port
+3 - file does not exit
+4 - writing failed. 
