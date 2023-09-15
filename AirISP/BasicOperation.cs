@@ -75,7 +75,7 @@ namespace AirISP
                 catch (Exception ex)
                 {
                     ColorfulConsole.WarnLine($"{(Tool.IsZh() ? "打开串口失败" : "Failed to open serial port")}: {ex.Message}");
-                    Environment.Exit(0);
+                    Environment.Exit(2);
                     return false;
                 }
                 return true;
@@ -239,7 +239,7 @@ namespace AirISP
                 "你可以尝试手动进入boot模式：\r\n" +
                 "拔掉USB、按住BOOT按键不要松开、插入USB，重新尝试下载操作。\r\n" +
                 "下载完成后，再松开松开BOOT按键，此时再按一下RST复位即可。" : "fail to reset device to boot status, timeout, exit...");
-            Environment.Exit(0);
+            Environment.Exit(1);
             return false;
         }
 
