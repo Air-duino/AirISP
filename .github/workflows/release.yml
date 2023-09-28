@@ -33,7 +33,8 @@ jobs:
           DOTNETARCH: ${{ matrix.dotnetarch }}
         run: |
           cd AirISP
-          dotnet publish --configuration Release -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
+          if [ "$DOTNETOS-$DOTNETARCH" = "osx-arm64" ]; then export SINGLE_FILE=false; else export SINGLE_FILE=true; fi
+          dotnet publish --configuration Release -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=$SINGLE_FILE -p:PublishTrimmed=true --self-contained true
           mkdir pkg
           mv bin/Release/net7.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
 
