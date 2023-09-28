@@ -101,7 +101,7 @@ jobs:
         cd ..
         tar -cvf AirISP-linux-x64.tar AirISP-linux-x64/
         cd AirISP-osx-arm64
-        chmod +x ./*
+        chmod +x -R ./*
         cd ..
         tar -cvf AirISP-osx-arm64.tar AirISP-osx-arm64/
         cd AirISP-osx-x64
