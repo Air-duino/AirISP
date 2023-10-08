@@ -10,5 +10,5 @@ Some of errors have their exitcode. You can see the table in exitcode.txt.
 **Note: Command line names should be lowercase according to the Arch Linux specification, after installation the command line will be: `airisp`**.
 
 ```bash
-yay -S
+yay -Syu airisp
 ```
