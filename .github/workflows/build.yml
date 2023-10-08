@@ -22,8 +22,6 @@ jobs:
             dotnetarch: x86
           - dotnetos: osx
             dotnetarch: arm
-          - dotnetos: osx
-            dotnetarch: arm64
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +34,8 @@ jobs:
           DOTNETARCH: ${{ matrix.dotnetarch }}
         run: |
           cd AirISP
-          dotnet publish -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
+          if [ "$DOTNETOS-$DOTNETARCH" = "osx-arm64" ]; then export SINGLE_FILE=false; else export SINGLE_FILE=true; fi
+          dotnet publish -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=$SINGLE_FILE -p:PublishTrimmed=true --self-contained true
           mkdir pkg
           mv bin/Debug/net7.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
 
