@@ -1,5 +1,5 @@
-# Air001-ISP
-An ISP tool for Air001
+# AirISP
+An ISP tool for AirMCU
 
 Compatible with Arduino IDE 2.x and VScode Arduino plugin known. 
 
