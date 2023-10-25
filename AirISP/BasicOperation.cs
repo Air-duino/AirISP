@@ -182,7 +182,7 @@ namespace AirISP
 
                             serial.RtsEnable = true;
                             serial.DtrEnable = false;
-                            Thread.Sleep(10);
+                            // Thread.Sleep(10);
 
                             serial.RtsEnable = false;
                             serial.DtrEnable = true;

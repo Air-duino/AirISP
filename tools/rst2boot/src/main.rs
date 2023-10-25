@@ -21,7 +21,7 @@ fn main() {
 
     port.write_request_to_send(true).unwrap();
     port.write_data_terminal_ready(false).unwrap();
-    std::thread::sleep(Duration::from_millis(10));
+    std::thread::sleep(Duration::from_millis(5));
 
     port.write_request_to_send(false).unwrap();
     port.write_data_terminal_ready(true).unwrap();
