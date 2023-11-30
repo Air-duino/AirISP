@@ -27,7 +27,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: environment prepare
         run: |
-          curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --channel STS
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https
+          sudo apt-get update
+          sudo apt-get install -y dotnet-sdk-8.0
+          sudo apt-get install -y p7zip-full
       - name: build
         env:
           DOTNETOS: ${{ matrix.dotnetos }}
@@ -37,7 +41,7 @@ jobs:
           if [ "$DOTNETOS-$DOTNETARCH" = "osx-arm64" ]; then export SINGLE_FILE=false; else export SINGLE_FILE=true; fi
           dotnet publish -r $DOTNETOS-$DOTNETARCH -p:PublishSingleFile=$SINGLE_FILE -p:PublishTrimmed=true --self-contained true
           mkdir pkg
-          mv bin/Debug/net7.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
+          mv bin/Debug/net8.0/$DOTNETOS-$DOTNETARCH/publish/* pkg/
 
       - uses: actions/upload-artifact@v3
         with:
