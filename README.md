@@ -1,4 +1,7 @@
 # AirISP
+
+**This tool will not be updated and its successor will be [AirISP-next](https://github.com/Air-duino/AirISP-next).**
+
 An ISP tool for AirMCU
 
 Compatible with Arduino IDE 2.x and VScode Arduino plugin known. 
